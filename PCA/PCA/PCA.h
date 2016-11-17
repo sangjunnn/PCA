@@ -31,4 +31,6 @@ void GetAverageMatrix(uchar** img_ori, uchar** ave_ori, int width, int height);
 void GetCovarianceMat(uchar** img_ori, uchar** img_ave, uchar** img_cov, int width, int height);
 void Transpose(int** img_ave_removed, int** img_ave_removed_T, int width, int height);
 
+void 
+
 #endif
