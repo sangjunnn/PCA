@@ -33,6 +33,14 @@ void MemFree_2D(uchar** arr, int height) {
 	free(arr);
 }
 
+void MemFree_2D_int(int** arr, int height) {
+	int i;
+	for (i = 0; i < height; i++) {//2차원 동적 메모리 해제
+		free(arr[i]);
+	}
+	free(arr);
+}
+
 void FileRead(uchar** img_in, int width, int height, char* path) {
 	uchar* img_BMP = (uchar*)malloc(width * height * 3 * sizeof(uchar));
 	uchar* img_RAW = (uchar*)malloc(width * height * sizeof(uchar));
@@ -76,20 +84,6 @@ void BMPtoRAW_Gray(uchar* in_bmp, uchar *out_raw, int width, int height) {
 	}
 }
 
-void FileWrite(char* filename, uchar** img_out, int width, int height) {
-	FILE* fp_out;
-	int i;
-
-	fp_out = fopen(filename, "wb");	//파일 쓰기
-	if (!fp_out) {
-		printf("/////");
-	}
-	for (i = 0; i < height; i++) {
-		fwrite(img_out[i], sizeof(uchar), width, fp_out);
-	}
-	fclose(fp_out);
-}
-
 void GetAverageMatrix(uchar** img_ori, uchar** ave_ori, int width, int height) {
 	int ave = 0;
 	int cnt = 0;
@@ -115,19 +109,19 @@ void Transpose(int** img_ave_removed, int** img_ave_removed_T, int width, int he
 }//h=NUMFOLDERS*NUMFILES//w=WIDTH*HEIGHT
 
 void GetCovarianceMat(uchar** img_ori, uchar** img_ave, uchar** img_cov, int width, int height) {
-	int** img_ave_removed = MemAlloc_2D_int(WIDTH * HEIGHT, NUMFOLDERS * NUMFILES);
-	int** img_ave_removed_T= MemAlloc_2D_int(NUMFOLDERS * NUMFILES, WIDTH * HEIGHT);
+	int** img_ave_removed_T = MemAlloc_2D_int(WIDTH * HEIGHT, NUMFOLDERS * NUMFILES);
+	int** img_ave_removed = MemAlloc_2D_int(NUMFOLDERS * NUMFILES, WIDTH * HEIGHT);
 	int sum;
 	for (int w = 0; w < width*height; w++) {
 		for (int f = 0; f < NUMFOLDERS; f++) {
 			for (int h = 0; h < NUMFILES; h++) {
-				img_ave_removed[f*NUMFOLDERS + h][w] = img_ori[f*NUMFOLDERS + h][w] - img_ave[f][w];
+				img_ave_removed[w][f*NUMFOLDERS + h] = img_ori[w][f*NUMFOLDERS + h] - img_ave[w][f];
 			}
 		}
 	}//각 영상에서 평균값 제거
-	printf("3.1\n");
-	Transpose(img_ave_removed, img_ave_removed_T, WIDTH * HEIGHT, NUMFOLDERS * NUMFILES);
-	printf("3.2\n");
+	
+	Transpose(img_ave_removed, img_ave_removed_T, NUMFOLDERS * NUMFILES, WIDTH * HEIGHT);
+	
 	for (int i = 0; i < WIDTH * HEIGHT;i++) {
 		for (int j = 0; j < WIDTH * HEIGHT; j++) {
 			sum = 0;
@@ -137,7 +131,7 @@ void GetCovarianceMat(uchar** img_ori, uchar** img_ave, uchar** img_cov, int wid
 			img_cov[i][j] = sum;
 		}
 	}
-	printf("3.3\n");
+	
 	free(img_ave_removed);
 	free(img_ave_removed_T);
 }

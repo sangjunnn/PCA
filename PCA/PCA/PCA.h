@@ -20,10 +20,11 @@ typedef unsigned char uchar;
 
 uchar** MemAlloc_2D(int width, int height);
 int** MemAlloc_2D_int(int width, int height);
+
 void MemFree_2D(uchar** arr, int height);
+void MemFree_2D_int(int** arr, int height);
 
 void FileRead(uchar** img_in, int width, int height, char* path);
-void FileWrite(char* filename, uchar** img_out, int height, int width);
 
 void BMPtoRAW_Gray(uchar* in_bmp, uchar *out_raw, int width, int height);
 
@@ -31,6 +32,6 @@ void GetAverageMatrix(uchar** img_ori, uchar** ave_ori, int width, int height);
 void GetCovarianceMat(uchar** img_ori, uchar** img_ave, uchar** img_cov, int width, int height);
 void Transpose(int** img_ave_removed, int** img_ave_removed_T, int width, int height);
 
-void 
+
 
 #endif
