@@ -108,32 +108,45 @@ void Transpose(int** img_ave_removed, int** img_ave_removed_T, int width, int he
 	}
 }//h=NUMFOLDERS*NUMFILES//w=WIDTH*HEIGHT
 
-void GetCovarianceMat(uchar** img_ori, uchar** img_ave, uchar** img_cov, int width, int height) {
+void GetCovarianceMat(uchar** img_ori, uchar** img_ave, int** img_cov, int width, int height) {
 	int** img_ave_removed_T = MemAlloc_2D_int(WIDTH * HEIGHT, NUMFOLDERS * NUMFILES);
 	int** img_ave_removed = MemAlloc_2D_int(NUMFOLDERS * NUMFILES, WIDTH * HEIGHT);
+	int** Q_x= MemAlloc_2D_int(NUMFILES*NUMFILES, NUMFILES*NUMFILES);
+
 	int sum;
-	for (int w = 0; w < width*height; w++) {
-		for (int f = 0; f < NUMFOLDERS; f++) {
+	for (int f = 0; f < NUMFOLDERS; f++) {
+		for (int w = 0; w < width*height; w++) {
 			for (int h = 0; h < NUMFILES; h++) {
 				img_ave_removed[w][f*NUMFOLDERS + h] = img_ori[w][f*NUMFOLDERS + h] - img_ave[w][f];
 			}
-		}
-	}//각 영상에서 평균값 제거
-	
-	Transpose(img_ave_removed, img_ave_removed_T, NUMFOLDERS * NUMFILES, WIDTH * HEIGHT);
-	
-	for (int i = 0; i < WIDTH * HEIGHT;i++) {
-		for (int j = 0; j < WIDTH * HEIGHT; j++) {
-			sum = 0;
-			for (int k = 0; k < NUMFILES*NUMFOLDERS; k++) {
-				sum += img_ave_removed_T[i][k] * img_ave_removed[k][j];
+		}//각 영상에서 평균값 제거
+
+		Transpose(img_ave_removed, img_ave_removed_T, NUMFOLDERS * NUMFILES, WIDTH * HEIGHT);
+
+		for (int i = 0; i < NUMFILES; i++) {
+			for (int j = 0; j < NUMFILES; j++) {
+				sum = 0;
+				for (int k = 0; k < WIDTH * HEIGHT; k++) {
+					sum += img_ave_removed_T[i][k] * img_ave_removed[k][j];
+				}
+				Q_x[i][j] = sum;//Q=>(8x8)Mat
 			}
-			img_cov[i][j] = sum;
+		}
+
+		for (int i = 0; i < WIDTH * HEIGHT; i++) {
+			for (int j = 0; j < WIDTH * HEIGHT; j++) {
+				sum = 0;
+				for (int k = 0; k < NUMFILES; k++) {
+					sum += img_ave_removed[i][k] * img_ave_removed_T[k][j];
+				}
+				img_cov[i][j] = sum;//cov=>((92x112)x(92x112))Mat
+			}
 		}
 	}
-	
 	free(img_ave_removed);
 	free(img_ave_removed_T);
 }
 
+void GetEigen(uchar** Q_x, int width, int height) {
 
+}
