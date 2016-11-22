@@ -1,0 +1,8 @@
+﻿  main.cpp
+  PCA.cpp
+PCA.cpp(158): warning C4244: '+=': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  코드를 생성하고 있습니다.
+  All 15 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  코드를 생성했습니다.
+  PCA.vcxproj -> C:\Users\DIMA\Source\Repos\PCA\PCA\PCA\Release\PCA.exe
+  PCA.vcxproj -> C:\Users\DIMA\Source\Repos\PCA\PCA\PCA\Release\PCA.pdb (Full PDB)
