@@ -79,8 +79,9 @@ void Test_FileRead(uchar** img_in, double** exp, double** effect, int width, int
 	double** expect = MemAlloc_2D_double(NUMTEST,10);
 	int k = 0;
 	double distance = 0;
+	//double* dist = (double*)malloc(sizeof(double)*NUMFOLDERS);
 
-	for (int i = 1; i < NUMTEST; i++) {
+	for (int i = 1; i <= NUMTEST; i++) {
 		char buffer[256];
 		sprintf(buffer, "%s/%d.bmp", path, i);
 		FILE* fp = fopen(buffer, "rb");
@@ -95,15 +96,19 @@ void Test_FileRead(uchar** img_in, double** exp, double** effect, int width, int
 
 		BMPtoRAW_Gray(img_BMP, img_RAW, width, height);
 		subSampling(img_RAW, img_RAW_sub, width, height, sub);
-
-		for (int m = 0; m < 10; m++){
-			for (int j = 0; j < width*height / (sub*sub); j++){
-				expect[m][i] += effect[m][j] * img_RAW_sub[j];
+		for (int k = 0; k < NUMFOLDERS; k++){
+			for (int m = 0; m < 10; m++){
+				for (int j = 0; j < width*height / (sub*sub); j++){
+					expect[m][i] += effect[m][j] * img_RAW_sub[j];
+				}
 			}
 			distance = getEuclideanDistance(expect, exp, NUMTEST, 10, sub);
-			printf("%d 번째 유클리디안 거리 : %f\n", i, distance);
+			printf("%d 번째 test 이미지와 %d 번째 training class의 유클리디안 거리 : %f\n",i, k+1, distance);
+			//dist[k] = distance;
+			//printf("%lf\n", dist[k]);
+
 		}
-		
+		printf("\n");
 	}
 
 	//for (int i = 0; i < 10; i++){
@@ -240,7 +245,7 @@ double** GetCovarianceMat(uchar** img_ori, uchar** img_ave, double** img_cov, do
 	return effective_eigen_T;
 }
 
-double** JacobiRotation(double** img_cov, int width, int height,int sub) {
+double** JacobiRotation(double** img_cov, int width, int height, int sub) {
 	double thresh = 0.0;
 	int n = width*height / (sub*sub);
 	double theta;
@@ -256,7 +261,7 @@ double** JacobiRotation(double** img_cov, int width, int height,int sub) {
 		EigenVector[i][i] = 1.0;
 		for (int j = 0; j < n; j++){
 			if (j != i){
-				EigenVector[i][j] = 0;
+				EigenVector[i][j] = 0.0;
 			}
 		}
 	}
@@ -311,10 +316,10 @@ double** JacobiRotation(double** img_cov, int width, int height,int sub) {
 
 				img_cov[i][j] = 0;
 			}
-			if (numif % 5000 == 0){
-				printf("%d\n", numif);
-			}
-			numif++;
+			/*if (numif % 5000 == 0){
+				printf("%d\n", numif);*/
+			//}
+			//numif++;
 			thresh = sqrt(thresh) / (double)(4 * n);
 		}
 	}
